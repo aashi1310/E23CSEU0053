@@ -1,67 +1,227 @@
-# Notification Priority Inbox
+# Notification Priority Inbox System
 
-A modern, interactive SaaS-style dashboard for managing and prioritizing notifications. Built with React, TypeScript, and Material UI, this application features a sleek UI with dark mode support, a custom priority sorting algorithm, and resilient API fallback mechanisms.
+A modern and responsive React + TypeScript notification management dashboard built for frontend evaluation purposes. The application provides an interactive notification experience with priority-based sorting, filtering, responsive layouts, dark mode support, and integrated logging middleware.
 
-## ✨ Features
+---
 
-- **Premium UI/UX**: Designed with a "SaaS-dashboard" aesthetic, featuring glassmorphism navbars, dense grid layouts, pill-style filtering, and interactive hover animations on cards.
-- **Priority Inbox Engine**: Automatically sorts and surfaces critical updates first using a custom priority algorithm (`Placement > Result > Event`).
-- **Resilient Engineering**: Gracefully handles API failures by catching errors, serving realistic dummy mock data, and alerting the user via toast notifications—ensuring the UI never breaks.
-- **Global Theming**: Complete light and dark mode toggling using explicit theme palette tokens and customized `ThemeContext`.
-- **Skeleton Loaders**: Provides a high-perceived-performance experience with structural skeleton loading states instead of generic spinners.
-- **Custom Middleware**: Integrated custom console logging middleware that tracks user events (e.g., clicks, filtering, API responses) across the frontend.
+## Features
 
-## 🛠 Tech Stack
+### Notification Management
+- View all notifications in a clean dashboard
+- Priority Inbox with top 10 most important notifications
+- Filter notifications by type:
+  - Event
+  - Result
+  - Placement
+- Read / unread distinction
+- Responsive notification cards
+- Real-time UI feedback
 
-- **Framework:** React 18
-- **Language:** TypeScript
-- **Bundler:** Vite
-- **UI Library:** Material UI (MUI) @mui/material & @mui/icons-material
-- **HTTP Client:** Axios
-- **Routing:** React Router v6
+---
 
-## 🚀 Getting Started
+## Priority Inbox Logic
 
-### Prerequisites
-- Node.js (v16+ recommended)
-- npm or yarn
+Notifications are prioritized using the following order:
 
-### Installation
+| Type | Priority Score |
+|------|------|
+| Placement | 3 |
+| Result | 2 |
+| Event | 1 |
 
-1. Clone the repository and navigate to the frontend directory:
-   ```bash
-   cd notification_app_fe
-   ```
+Sorting logic:
+1. Unread notifications first
+2. Higher priority notifications first
+3. Latest notifications first
 
-2. Install the dependencies:
-   ```bash
-   npm install
-   ```
+Only the top 10 notifications are displayed in the Priority Inbox.
 
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
+---
 
-4. Open your browser and navigate to `http://localhost:3000` (or the port specified by Vite).
+## UI/UX Highlights
 
-## 📂 Project Structure
+- Modern SaaS-inspired dashboard UI
+- Material UI components
+- Responsive design for:
+  - Desktop
+  - Tablet
+  - Mobile
+- Dark / Light mode support
+- Hover animations and transitions
+- Loading skeletons
+- Graceful API failure handling
+- Fallback mock notifications
 
+---
+
+## Tech Stack
+
+### Frontend
+- React
+- TypeScript
+- Vite
+- Material UI
+- React Router DOM
+- Axios
+
+---
+
+## Folder Structure
+
+```txt
+notification_app_fe/
+│
+├── public/
+├── src/
+│   ├── api/
+│   ├── components/
+│   ├── hooks/
+│   ├── layouts/
+│   ├── middleware/
+│   ├── pages/
+│   ├── services/
+│   ├── types/
+│   ├── utils/
+│   ├── App.tsx
+│   └── main.tsx
+│
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
 ```
-src/
-├── api/          # Axios instances and API service functions
-├── components/   # Reusable UI components (Navbar, Cards, Skeletons)
-├── context/      # React Context providers (ThemeContext)
-├── middleware/   # Custom frontend logging middleware
-├── pages/        # Main application views (AllNotifications, PriorityNotifications)
-├── routes/       # React Router configuration
-├── utils/        # Helper functions (sorting logic, mock fallback data)
-└── types/        # Global TypeScript interfaces and type definitions
+
+---
+
+## Logging Middleware
+
+A reusable logging middleware was implemented to capture:
+- API success/failure
+- Page navigation
+- Filter interactions
+- Notification events
+- Sorting operations
+
+### Example Log Payload
+
+```json
+{
+  "stack": "frontend",
+  "level": "info",
+  "package": "component",
+  "message": "Priority inbox loaded"
+}
 ```
 
-## 🎨 Design System
+---
 
-This app utilizes a custom overriding of Material UI defaults:
-- **Typography:** Uses `Inter` with strict weight hierarchies.
-- **Colors:** Custom palette targeting premium slate/navy aesthetics (e.g., `#0f172a`, `#f8fafc`).
-- **Visual Cues:** Left-colored borders on unread notifications to establish scanning hierarchy (Green for Placements, Blue for Results, Amber for Events).
+## API Integration
+
+### Base URL
+
+```txt
+http://4.224.186.213/evaluation-service
+```
+
+### Endpoints Used
+
+#### Authentication
+```txt
+POST /auth
+```
+
+#### Notifications
+```txt
+GET /notifications
+```
+
+#### Logging
+```txt
+POST /logs
+```
+
+---
+
+## Error Handling Strategy
+
+To ensure a smooth user experience:
+- Snackbar alerts are displayed for failures
+- Mock notification data is used as fallback
+- Loading states and retry options are provided
+- Errors are logged through middleware
+
+---
+
+## Installation
+
+### Clone Repository
+
+```bash
+git clone <your-repository-url>
+```
+
+### Navigate to Project
+
+```bash
+cd notification_app_fe
+```
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Start Development Server
+
+```bash
+npm run dev
+```
+
+Application runs on:
+
+```txt
+http://localhost:3000
+```
+
+---
+
+## Screenshots to Include
+
+- Desktop Dashboard
+- Mobile Responsive View
+- Priority Inbox
+- Dark Mode
+- API Response
+- Logging Middleware Success
+- Notification Filters
+
+---
+
+## Future Improvements
+
+- Real-time notifications using WebSockets
+- Backend persistence
+- User authentication
+- Push notifications
+- Notification grouping
+- Advanced analytics dashboard
+
+---
+
+## Learning Outcome
+
+This project provided hands-on experience with:
+- Frontend architecture
+- TypeScript integration
+- API handling
+- Error management
+- Responsive UI design
+- Middleware implementation
+- UX-focused engineering
+
+---
+
+## Author
+
+Aashika  
+Frontend Engineering Evaluation Project
