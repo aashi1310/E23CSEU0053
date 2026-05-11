@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Box, Pagination } from '@mui/material';
+import { Typography, Box, Pagination, Grid, Snackbar, Alert } from '@mui/material';
 import PageContainer from '../components/common/PageContainer';
 import FilterBar from '../components/FilterBar';
 import NotificationList from '../components/NotificationList';
-import ErrorState from '../components/common/ErrorState';
 import DashboardStats from '../components/DashboardStats';
 import { getNotifications } from '../api/notifications';
 import type { Notification, NotificationType } from '../types';
 import { Log } from '../middleware/logger';
+import { mockNotifications } from '../utils/mockData';
 
 const AllNotifications: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<NotificationType>('All');
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   
-  // Dashboard stats derived state (in a real app, backend might provide these)
-  const totalCount = 124; // Mocked for design
+  // Dashboard stats derived state
+  const totalCount = 124; 
   const unreadCount = 24;
   const placementCount = 12;
   const priorityCount = 10;
@@ -26,13 +27,23 @@ const AllNotifications: React.FC = () => {
   const fetchNotifications = async (currentPage: number, currentFilter: NotificationType) => {
     try {
       setLoading(true);
-      setError(null);
-      const limit = 10; // Items per page
+      const limit = 10;
       const response = await getNotifications(currentPage, limit, currentFilter);
       setNotifications(response.data);
       setTotalPages(Math.ceil(response.total / limit) || 1);
     } catch (err: any) {
-      setError('Failed to load notifications. Please try again later.');
+      Log('frontend', 'error', 'api', 'Failed to fetch notifications');
+      
+      // Fallback to mock data
+      let filteredMock = mockNotifications;
+      if (currentFilter !== 'All') {
+        filteredMock = mockNotifications.filter(n => n.type === currentFilter);
+      }
+      setNotifications(filteredMock);
+      setTotalPages(1);
+      
+      setSnackbarMessage('Using demo notifications due to server issue.');
+      setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
@@ -45,7 +56,7 @@ const AllNotifications: React.FC = () => {
 
   const handleFilterChange = (newFilter: NotificationType) => {
     setFilter(newFilter);
-    setPage(1); // Reset to first page on filter change
+    setPage(1); 
     Log('frontend', 'info', 'AllNotifications', `Filter changed to ${newFilter}`);
   };
 
@@ -56,47 +67,66 @@ const AllNotifications: React.FC = () => {
 
   const handleNotificationClick = (id: string) => {
     Log('frontend', 'info', 'AllNotifications', `Clicked notification ${id}`);
-    // Optional: Add logic to mark as read or open details
+    
+    // Optimistic unread toggle
+    setNotifications(prev => 
+      prev.map(n => n.id === id ? { ...n, read: true } : n)
+    );
   };
 
   return (
     <PageContainer>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 800, mb: 3 }}>
-        Inbox Overview
-      </Typography>
-      
-      <DashboardStats 
-        total={totalCount} 
-        unread={unreadCount} 
-        placements={placementCount} 
-        priorityCount={priorityCount} 
-      />
+      <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 800, mb: 3 }}>
+          Inbox Overview
+        </Typography>
+        
+        <DashboardStats 
+          total={totalCount} 
+          unread={unreadCount} 
+          placements={placementCount} 
+          priorityCount={priorityCount} 
+        />
 
-      <FilterBar currentFilter={filter} onFilterChange={handleFilterChange} />
-      
-      {error && <ErrorState error={error} onRetry={() => fetchNotifications(page, filter)} />}
-      
-      {!error && (
-        <>
-          <NotificationList 
-            notifications={notifications} 
-            loading={loading}
-            onNotificationClick={handleNotificationClick} 
-          />
-          
-          {!loading && notifications.length > 0 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <Pagination 
-                count={totalPages} 
-                page={page} 
-                onChange={handlePageChange} 
-                color="primary" 
-                shape="rounded"
-              />
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={3}>
+            <Box sx={{ position: { md: 'sticky' }, top: 100 }}>
+              <FilterBar currentFilter={filter} onFilterChange={handleFilterChange} orientation="vertical" />
             </Box>
-          )}
-        </>
-      )}
+          </Grid>
+          
+          <Grid item xs={12} md={9}>
+            <NotificationList 
+              notifications={notifications} 
+              loading={loading}
+              onNotificationClick={handleNotificationClick} 
+            />
+            
+            {!loading && notifications.length > 0 && (
+              <Box sx={{ display: 'flex', mt: 4 }}>
+                <Pagination 
+                  count={totalPages} 
+                  page={page} 
+                  onChange={handlePageChange} 
+                  color="primary" 
+                  shape="rounded"
+                />
+              </Box>
+            )}
+          </Grid>
+        </Grid>
+      </Box>
+
+      <Snackbar 
+        open={snackbarOpen} 
+        autoHideDuration={6000} 
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity="warning" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </PageContainer>
   );
 };

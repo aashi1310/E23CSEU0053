@@ -24,6 +24,16 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, onCli
   };
 
   const { icon, color } = getIconAndColor(notification.type);
+  
+  const getBorderColor = (type: string) => {
+    switch (type) {
+      case 'Placement': return '#10b981';
+      case 'Result': return '#3b82f6';
+      case 'Event': return '#f59e0b';
+      default: return theme.palette.primary.main;
+    }
+  };
+
   const formattedDate = new Date(notification.timestamp).toLocaleString(undefined, {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
@@ -35,13 +45,14 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, onCli
         mb: 2, 
         cursor: onClick ? 'pointer' : 'default',
         borderRadius: 4,
-        borderLeft: !notification.read ? `5px solid ${theme.palette.primary.main}` : '5px solid transparent',
-        boxShadow: theme.palette.mode === 'dark' ? '0 4px 6px -1px rgba(0, 0, 0, 0.5)' : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
-        bgcolor: 'background.paper',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        borderLeft: !notification.read ? `5px solid ${getBorderColor(notification.type)}` : '5px solid transparent',
+        boxShadow: theme.palette.mode === 'dark' ? '0 4px 6px -1px rgba(0, 0, 0, 0.5)' : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+        bgcolor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+        transition: 'all 0.25s ease',
         '&:hover': {
-          transform: onClick ? 'translateY(-3px)' : 'none',
-          boxShadow: theme.palette.mode === 'dark' ? '0 10px 15px -3px rgba(0, 0, 0, 0.7)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+          transform: onClick ? 'translateY(-4px)' : 'none',
+          boxShadow: theme.palette.mode === 'dark' ? '0 12px 30px rgba(0,0,0,0.5)' : '0 12px 30px rgba(0,0,0,0.12)',
         }
       }}
     >

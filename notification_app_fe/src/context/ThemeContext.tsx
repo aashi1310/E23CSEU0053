@@ -46,11 +46,11 @@ export const CustomThemeProvider: React.FC<{ children: React.ReactNode }> = ({ c
             ? {
                 primary: { main: '#2563eb' },
                 background: { default: '#f8fafc', paper: '#ffffff' },
-                text: { primary: '#0f172a', secondary: '#64748b' },
+                text: { primary: '#0f172a', secondary: '#475569' },
               }
             : {
                 primary: { main: '#3b82f6' },
-                background: { default: '#0f172a', paper: '#1e293b' },
+                background: { default: '#0f172a', paper: '#111827' },
                 text: { primary: '#f8fafc', secondary: '#94a3b8' },
               }),
         },
