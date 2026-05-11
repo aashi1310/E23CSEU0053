@@ -1,6 +1,10 @@
 import React from 'react';
-import { Card, CardContent, Typography, Chip, Box, Badge } from '@mui/material';
-import { Notification } from '../types';
+import { Card, CardContent, Typography, Chip, Box, useTheme } from '@mui/material';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import SchoolIcon from '@mui/icons-material/School';
+import WorkIcon from '@mui/icons-material/Work';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import type { Notification } from '../types';
 
 interface NotificationCardProps {
   notification: Notification;
@@ -8,16 +12,21 @@ interface NotificationCardProps {
 }
 
 const NotificationCard: React.FC<NotificationCardProps> = ({ notification, onClick }) => {
-  const getChipColor = (type: string) => {
+  const theme = useTheme();
+  
+  const getIconAndColor = (type: string) => {
     switch (type) {
-      case 'Placement': return 'error';
-      case 'Result': return 'warning';
-      case 'Event': return 'info';
-      default: return 'default';
+      case 'Placement': return { icon: <WorkIcon fontSize="small" />, color: 'error' };
+      case 'Result': return { icon: <SchoolIcon fontSize="small" />, color: 'warning' };
+      case 'Event': return { icon: <CalendarTodayIcon fontSize="small" />, color: 'info' };
+      default: return { icon: <NotificationsIcon fontSize="small" />, color: 'default' };
     }
   };
 
-  const formattedDate = new Date(notification.timestamp).toLocaleString();
+  const { icon, color } = getIconAndColor(notification.type);
+  const formattedDate = new Date(notification.timestamp).toLocaleString(undefined, {
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
 
   return (
     <Card 
@@ -25,31 +34,50 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, onCli
       sx={{ 
         mb: 2, 
         cursor: onClick ? 'pointer' : 'default',
-        borderRadius: 2,
-        boxShadow: notification.read ? 1 : 3,
-        bgcolor: notification.read ? 'background.paper' : 'action.hover',
-        transition: '0.2s',
+        borderRadius: 4,
+        borderLeft: !notification.read ? `5px solid ${theme.palette.primary.main}` : '5px solid transparent',
+        boxShadow: theme.palette.mode === 'dark' ? '0 4px 6px -1px rgba(0, 0, 0, 0.5)' : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
+        bgcolor: 'background.paper',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         '&:hover': {
-          boxShadow: 4,
-          transform: onClick ? 'translateY(-2px)' : 'none'
+          transform: onClick ? 'translateY(-3px)' : 'none',
+          boxShadow: theme.palette.mode === 'dark' ? '0 10px 15px -3px rgba(0, 0, 0, 0.7)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
         }
       }}
     >
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {!notification.read && <Badge color="primary" variant="dot" sx={{ mr: 1 }} />}
-            <Typography variant="h6" component="div" sx={{ fontWeight: notification.read ? 'normal' : 'bold' }}>
-              {notification.title}
-            </Typography>
+      <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                width: 40,
+                height: 40,
+                borderRadius: 2,
+                bgcolor: `${color}.main` + '15',
+                color: `${color}.main`,
+              }}
+            >
+              {icon}
+            </Box>
+            <Box>
+              <Typography variant="h6" component="div" sx={{ fontWeight: notification.read ? 600 : 700, lineHeight: 1.2 }}>
+                {notification.title}
+                {!notification.read && (
+                  <Box component="span" sx={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main', ml: 1, verticalAlign: 'middle' }} />
+                )}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                {formattedDate}
+              </Typography>
+            </Box>
           </Box>
-          <Chip size="small" label={notification.type} color={getChipColor(notification.type) as any} />
+          <Chip size="small" label={notification.type} color={color as any} sx={{ fontWeight: 600, borderRadius: '6px' }} />
         </Box>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ ml: 6.5, lineHeight: 1.6 }}>
           {notification.message}
-        </Typography>
-        <Typography variant="caption" color="text.disabled">
-          {formattedDate}
         </Typography>
       </CardContent>
     </Card>

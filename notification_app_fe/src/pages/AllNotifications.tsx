@@ -3,10 +3,10 @@ import { Typography, Box, Pagination } from '@mui/material';
 import PageContainer from '../components/common/PageContainer';
 import FilterBar from '../components/FilterBar';
 import NotificationList from '../components/NotificationList';
-import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorState from '../components/common/ErrorState';
+import DashboardStats from '../components/DashboardStats';
 import { getNotifications } from '../api/notifications';
-import { Notification, NotificationType } from '../types';
+import type { Notification, NotificationType } from '../types';
 import { Log } from '../middleware/logger';
 
 const AllNotifications: React.FC = () => {
@@ -16,6 +16,12 @@ const AllNotifications: React.FC = () => {
   const [filter, setFilter] = useState<NotificationType>('All');
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  
+  // Dashboard stats derived state (in a real app, backend might provide these)
+  const totalCount = 124; // Mocked for design
+  const unreadCount = 24;
+  const placementCount = 12;
+  const priorityCount = 10;
 
   const fetchNotifications = async (currentPage: number, currentFilter: NotificationType) => {
     try {
@@ -43,7 +49,7 @@ const AllNotifications: React.FC = () => {
     Log('frontend', 'info', 'AllNotifications', `Filter changed to ${newFilter}`);
   };
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
     Log('frontend', 'info', 'AllNotifications', `Pagination changed to page ${value}`);
   };
@@ -55,29 +61,37 @@ const AllNotifications: React.FC = () => {
 
   return (
     <PageContainer>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-        All Notifications
+      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 800, mb: 3 }}>
+        Inbox Overview
       </Typography>
       
+      <DashboardStats 
+        total={totalCount} 
+        unread={unreadCount} 
+        placements={placementCount} 
+        priorityCount={priorityCount} 
+      />
+
       <FilterBar currentFilter={filter} onFilterChange={handleFilterChange} />
       
-      {loading && <LoadingSpinner />}
       {error && <ErrorState error={error} onRetry={() => fetchNotifications(page, filter)} />}
       
-      {!loading && !error && (
+      {!error && (
         <>
           <NotificationList 
             notifications={notifications} 
+            loading={loading}
             onNotificationClick={handleNotificationClick} 
           />
           
-          {notifications.length > 0 && (
+          {!loading && notifications.length > 0 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
               <Pagination 
                 count={totalPages} 
                 page={page} 
                 onChange={handlePageChange} 
                 color="primary" 
+                shape="rounded"
               />
             </Box>
           )}
