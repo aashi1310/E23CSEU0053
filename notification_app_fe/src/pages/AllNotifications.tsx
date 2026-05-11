@@ -55,7 +55,7 @@ const AllNotifications: React.FC = () => {
 
   return (
     <PageContainer>
-      <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
         All Notifications
       </Typography>
       

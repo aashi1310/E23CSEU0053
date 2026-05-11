@@ -1,4 +1,4 @@
-import { Notification } from '../types';
+import type { Notification } from '../types';
 
 const PRIORITY_SCORES: Record<string, number> = {
   Placement: 3,

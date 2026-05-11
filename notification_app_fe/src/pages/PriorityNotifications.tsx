@@ -42,10 +42,10 @@ const PriorityNotifications: React.FC = () => {
 
   return (
     <PageContainer>
-      <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
         Priority Inbox
       </Typography>
-      <Typography variant="subtitle1" color="text.secondary" paragraph>
+      <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 2 }}>
         Your top 10 most important notifications based on urgency and type.
       </Typography>
       
